@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import feeContext from "./feeContext";
 import axios from "axios";
 
@@ -10,7 +10,7 @@ const FeeProvider = ({ children }) => {
   const [error, setError] = useState(null); // Error state
 
   // Fetch all fee records
-  const fetchFees = async () => {
+  const fetchFees = useCallback(async () => {
     setLoading(true);
     try {
       const response = await axios.get(`${url}/fees`);
@@ -22,10 +22,10 @@ const FeeProvider = ({ children }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [url]);
 
   // Fetch fees by user ID
-  const fetchFeesByUserId = async (userId) => {
+  const fetchFeesByUserId = useCallback(async (userId) => {
     setLoading(true);
     try {
       const response = await axios.get(`${url}/fees/${userId}`);
@@ -37,10 +37,10 @@ const FeeProvider = ({ children }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [url]);
 
   // Update fee information
-  const updateFee = async (userId, feeData) => {
+  const updateFee = useCallback(async (userId, feeData) => {
     try {
       const response = await axios.put(`${url}/fees/updateFee/${userId}`, feeData);
       setError(null);
@@ -50,7 +50,7 @@ const FeeProvider = ({ children }) => {
       setError(error.response?.data || "Update failed");
       throw error;
     }
-  };
+  }, [url]);
 
   const value = {
     fees,

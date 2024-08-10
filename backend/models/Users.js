@@ -67,8 +67,8 @@ UserSchema.post('save', async function (doc) {
         if (!feeExists) {
             await Fee.create({
                 userId: doc._id,
-                amountDue: 0,
-                amountPaid: 0,
+                amountDue: 0, // Ensure this is 0, not 1000
+                totalFee: 0,
                 dueDate: null,
                 paymentHistory: []
             });

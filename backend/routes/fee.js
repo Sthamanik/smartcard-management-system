@@ -26,7 +26,6 @@ router.get('/:userId', async (req, res) => {
     }
 });
 
-// Route to update fee information
 router.put('/updateFee/:userId', async (req, res) => {
     const { userId } = req.params;
     const { amountPaid, amountDue, dueDate } = req.body;
@@ -44,7 +43,6 @@ router.put('/updateFee/:userId', async (req, res) => {
             if (typeof amountPaid !== 'number') {
                 return res.status(400).json({ error: 'amountPaid must be a number' });
             }
-            fee.amountPaid += amountPaid;
             fee.amountDue -= amountPaid; // Deduct the paid amount from the due amount
 
             // Ensure amountDue does not go below 0
@@ -65,7 +63,6 @@ router.put('/updateFee/:userId', async (req, res) => {
                 return res.status(400).json({ error: 'amountDue must be a number' });
             }
             fee.amountDue = amountDue;
-            fee.amountPaid = 0; // Reset amountPaid to 0 when updating amountDue
 
             // Update dueDate if provided
             if (dueDate) {

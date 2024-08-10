@@ -1,25 +1,15 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { Edit, Trash, Save, XCircle } from 'lucide-react';
-import FeeContext from '../../contexts/fees/feeContext';
+import feeContext from '../../contexts/fees/feeContext'; // Ensure correct path
+import { Edit, Save, XCircle } from 'lucide-react';
 
 const FeeList = () => {
-  const {
-    fees,
-    fetchFeeDetails,
-    updateFeeDetails,
-    deleteFee,
-    loading,
-    error,
-  } = useContext(FeeContext);
-
+  const { fees, fetchFees, updateFee, loading, error } = useContext(feeContext);
   const [editableFeeId, setEditableFeeId] = useState(null);
   const [editableData, setEditableData] = useState({});
 
   useEffect(() => {
-    if (fees.length === 0) {
-      fetchFeeDetails();
-    }
-  }, [fees, fetchFeeDetails]);
+    fetchFees(); // Fetch fees when the component mounts
+  }, [fetchFees]);
 
   if (loading) {
     return <div>Loading...</div>;
@@ -42,7 +32,7 @@ const FeeList = () => {
 
   // Handle save button click
   const handleSave = async (feeId) => {
-    await updateFeeDetails(feeId, editableData);
+    await updateFee(feeId, editableData);
     setEditableFeeId(null);
   };
 
@@ -50,12 +40,6 @@ const FeeList = () => {
   const handleCancel = () => {
     setEditableFeeId(null);
     setEditableData({});
-  };
-
-  // Handle delete button click
-  const handleDelete = async (feeId) => {
-    await deleteFee(feeId);
-    fetchFeeDetails(); // Refetch fees after deletion
   };
 
   return (
@@ -67,7 +51,7 @@ const FeeList = () => {
             <tr>
               <th className="px-4 py-2 text-left">User ID</th>
               <th className="px-4 py-2 text-left">Amount Due</th>
-              <th className="px-4 py-2 text-left">Amount Paid</th>
+              <th className="px-4 py-2 text-left">Total Fee</th>
               <th className="px-4 py-2 text-left">Due Date</th>
               <th className="px-4 py-2 text-left">Payment History</th>
               <th className="px-4 py-2 text-center">Actions</th>
@@ -84,6 +68,7 @@ const FeeList = () => {
                         value={editableData.userId}
                         onChange={(e) => handleInputChange(e, 'userId')}
                         className="w-full border border-gray-300 rounded p-1"
+                        readOnly // userId should not be editable
                       />
                     </td>
                     <td className="px-4 py-2">
@@ -97,40 +82,69 @@ const FeeList = () => {
                     <td className="px-4 py-2">
                       <input
                         type="number"
-                        value={editableData.amountPaid}
-                        onChange={(e) => handleInputChange(e, 'amountPaid')}
+                        value={editableData.totalFee}
+                        onChange={(e) => handleInputChange(e, 'totalFee')}
                         className="w-full border border-gray-300 rounded p-1"
                       />
                     </td>
                     <td className="px-4 py-2">
                       <input
                         type="date"
-                        value={editableData.dueDate?.split('T')[0]} // Adjust for date input
+                        value={editableData.dueDate?.slice(0, 10)}
                         onChange={(e) => handleInputChange(e, 'dueDate')}
                         className="w-full border border-gray-300 rounded p-1"
                       />
                     </td>
                     <td className="px-4 py-2">
-                      <textarea
-                        value={editableData.paymentHistory.map(ph => `Amount: ${ph.amountPaid}, Date: ${new Date(ph.paidOn).toLocaleDateString()}`).join('\n')}
-                        onChange={(e) => handleInputChange(e, 'paymentHistory')}
-                        className="w-full border border-gray-300 rounded p-1"
-                        readOnly
-                      />
+                      {fee.paymentHistory.length > 0 ? (
+                        <table className="w-full border border-gray-300">
+                          <thead>
+                            <tr>
+                              <th className="px-2 py-1 border-b border-gray-300">Amount Paid</th>
+                              <th className="px-2 py-1 border-b border-gray-300">Paid On</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {fee.paymentHistory.map((payment, index) => (
+                              <tr key={index} className="border-t border-gray-200">
+                                <td className="px-2 py-1">{payment.amountPaid}</td>
+                                <td className="px-2 py-1">{new Date(payment.paidOn).toLocaleDateString()}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      ) : (
+                        <div>No Payment History</div>
+                      )}
                     </td>
                   </>
                 ) : (
                   <>
                     <td className="px-4 py-2">{fee.userId}</td>
                     <td className="px-4 py-2">{fee.amountDue}</td>
-                    <td className="px-4 py-2">{fee.amountPaid}</td>
-                    <td className="px-4 py-2">{fee.dueDate ? new Date(fee.dueDate).toLocaleDateString() : 'N/A'}</td>
+                    <td className="px-4 py-2">{fee.totalFee}</td>
+                    <td className="px-4 py-2">{fee.dueDate ? new Date(fee.dueDate).toLocaleDateString() : 'No Due Date'}</td>
                     <td className="px-4 py-2">
-                      {fee.paymentHistory.map((ph, index) => (
-                        <div key={index}>
-                          Amount: {ph.amountPaid}, Date: {new Date(ph.paidOn).toLocaleDateString()}
-                        </div>
-                      ))}
+                      {fee.paymentHistory.length > 0 ? (
+                        <table className="w-full border border-gray-300">
+                          <thead>
+                            <tr>
+                              <th className="px-2 py-1 border-b border-gray-300">Amount Paid</th>
+                              <th className="px-2 py-1 border-b border-gray-300">Paid On</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {fee.paymentHistory.map((payment, index) => (
+                              <tr key={index} className="border-t border-gray-200">
+                                <td className="px-2 py-1">{payment.amountPaid}</td>
+                                <td className="px-2 py-1">{new Date(payment.paidOn).toLocaleDateString()}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      ) : (
+                        <div>No Payment History</div>
+                      )}
                     </td>
                   </>
                 )}
@@ -157,12 +171,6 @@ const FeeList = () => {
                         className="text-blue-500 hover:text-blue-700"
                       >
                         <Edit className="w-5 h-5" />
-                      </button>
-                      <button
-                        onClick={() => handleDelete(fee._id)}
-                        className="text-red-500 hover:text-red-700"
-                      >
-                        <Trash className="w-5 h-5" />
                       </button>
                     </>
                   )}
