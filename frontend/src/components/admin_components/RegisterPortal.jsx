@@ -1,9 +1,9 @@
-import React, { useState, useContext } from "react";
-import AuthContext from "../contexts/auth/authContext";
-import { Link, useNavigate } from "react-router-dom"; // Import Link
+import React, { useContext, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import authContext from '../../contexts/auth/authContext';
 
-const Signup = () => {
-  const { signupUser } = useContext(AuthContext);
+const RegisterPortal = () => {
+  const { signupUser } = useContext(authContext);
   const navigate = useNavigate();
   
   const [formData, setFormData] = useState({
@@ -14,7 +14,7 @@ const Signup = () => {
     DOB: '',
     gender: 'male',
     contact: '',
-    role: 'admin',
+    role: 'user', // Default role is "user"
     faculty: '',
     batch: '',
     uid: '',
@@ -34,15 +34,28 @@ const Signup = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(formData)
+    console.log(formData);
   
     try {
       const result = await signupUser(formData);
   
       if (result.success) {
         setError(null);
-        setFormData({name: '', email: '',password: '',address: '',DOB: '',gender: 'male',contact: '',role: 'user',faculty: '',batch: '',uid: '',key: ''})
-        navigate('/')
+        setFormData({
+          name: '',
+          email: '',
+          password: '',
+          address: '',
+          DOB: '',
+          gender: 'male',
+          contact: '',
+          role: 'user',
+          faculty: '',
+          batch: '',
+          uid: '',
+          key: ''
+        });
+        navigate('/');
         setSuccess("Signup successful!");
       } else {
         setError(result.message || "Signup failed. Please try again.");
@@ -57,7 +70,7 @@ const Signup = () => {
 
   return (
     <div className="max-w-lg mx-auto p-6 bg-white shadow-lg rounded-lg mt-10 lg:max-w-4xl">
-      <h2 className="text-lg md:text-xl lg:text-2xl font-bold mb-6 text-center text-gray-800">Signup</h2>
+      <h2 className="text-lg md:text-xl lg:text-2xl font-bold mb-6 text-center text-gray-800">Register the user</h2>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2">
           <div>
@@ -148,15 +161,19 @@ const Signup = () => {
           </div>
           <div>
             <label htmlFor="role" className="block text-xs md:text-sm lg:text-base font-medium text-gray-700">Role:</label>
-            <input
-                  type="text"
-                  id="role"
-                  name="role"
-                  value={formData.role}
-                  disabled
-                  className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 text-xs md:text-sm lg:text-base focus:ring-indigo-500 focus:border-indigo-500"
-                />
+            <select
+              id="role"
+              name="role"
+              value={formData.role}
+              onChange={handleChange}
+              required
+              className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 text-xs md:text-sm lg:text-base focus:ring-indigo-500 focus:border-indigo-500"
+            >
+              <option value="user">User</option>
+              <option value="staff">Staff</option>
+            </select>
           </div>
+
           {formData.role === 'user' && (
             <>
               <div>
@@ -194,6 +211,7 @@ const Signup = () => {
               </div>
             </>
           )}
+
           {formData.role === 'admin' && (
             <div>
               <label htmlFor="key" className="block text-xs md:text-sm lg:text-base font-medium text-gray-700">Admin Key:</label>
@@ -214,14 +232,8 @@ const Signup = () => {
             type="submit"
             className="py-2 px-4 bg-indigo-600 text-white font-bold rounded-md shadow-sm hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 text-xs md:text-sm lg:text-base"
           >
-            Sign Up
+            Register
           </button>
-          <Link
-            to="/"
-            className="text-indigo-600 hover:underline text-xs md:text-sm lg:text-base"
-          >
-            Already have an account? Login
-          </Link>
         </div>
       </form>
       {error && <p className="mt-4 text-red-600 text-xs md:text-sm lg:text-base">{error}</p>}
@@ -230,4 +242,4 @@ const Signup = () => {
   );
 };
 
-export default Signup;
+export default RegisterPortal;

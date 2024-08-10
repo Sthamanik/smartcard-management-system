@@ -13,6 +13,7 @@ async function createDailyAttendanceRecords() {
             status: 'absent', 
             enteredAt: '-',
             exitedAt: '-',
+            date: date
         }));
 
         await Attendance.insertMany(attendanceRecords);

@@ -5,6 +5,16 @@ const initializeFeeData = require('../middlewares/initializeFee');
 
 router.use(initializeFeeData);
 
+// Route to get all fee records
+router.get('/', async (req, res) => {
+    try {
+        const fees = await Fee.find().sort({ date: -1 }); // Sort by date, descending
+        res.status(200).json(fees);
+    } catch (error) {
+        res.status(500).json({ error: 'Error fetching fee records' });
+    }
+})
+
 router.get('/:userId', async (req, res) => {
     const { userId } = req.params;
 

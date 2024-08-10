@@ -6,6 +6,7 @@ const attendanceSchema = new mongoose.Schema({
     status: { type: String, enum: ['present', 'absent'], default: 'absent' },
     enteredAt: { type: String, default: '-' },
     exitedAt: { type: String, default: '-' },
+    date: { type: Date, default: Date.now }
 });
 
 // Function to get the daily attendance model based on the current date
@@ -17,8 +18,7 @@ function getDailyAttendanceModel(date = new Date()) {
         return mongoose.model(collectionName);
     }
 
-    const DailyAttendanceSchema = new mongoose.Schema(attendanceSchema.obj);
-    return mongoose.model(collectionName, DailyAttendanceSchema);
+    return mongoose.model(collectionName, attendanceSchema);
 }
 
 module.exports = getDailyAttendanceModel;
