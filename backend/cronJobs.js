@@ -1,7 +1,7 @@
 const cron = require('node-cron');
-const User = require('./models/Users');
-const getDailyAttendanceModel = require('./models/Attendance');
-
+const mongoose = require('mongoose');
+const User = require('./models/Users'); 
+const getDailyAttendanceModel = require('./models/Attendance'); 
 async function createDailyAttendanceRecords() {
     const date = new Date();
     const Attendance = getDailyAttendanceModel(date);

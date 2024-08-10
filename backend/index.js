@@ -20,7 +20,7 @@ app.use(express.json());
 // routes
 app.use('/auth', require('./routes/auth'));
 app.use('/api', require('./routes/attendance'));
-app.use('/api/fees', require('./routes/fee'));
+app.use('/fees', require('./routes/fee'));
 
 app.get('/', (req, res) => {
     res.send('Welcome to ASMT');

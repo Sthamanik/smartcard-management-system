@@ -1,5 +1,6 @@
 const mongoose = require('mongoose')
 const {Schema} = mongoose;
+const Fee = require('./Fee');
 
 const UserSchema = new Schema({
     name: {
@@ -58,6 +59,21 @@ UserSchema.pre('save', function (next) {
         }
     }
     next();
+});
+
+UserSchema.post('save', async function (doc) {
+    if (doc.role === 'user') {
+        const feeExists = await Fee.findOne({ userId: doc._id });
+        if (!feeExists) {
+            await Fee.create({
+                userId: doc._id,
+                amountDue: 0,
+                amountPaid: 0,
+                dueDate: null,
+                paymentHistory: []
+            });
+        }
+    }
 });
 
 const User = mongoose.model('User', UserSchema);

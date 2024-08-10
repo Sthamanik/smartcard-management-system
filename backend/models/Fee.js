@@ -1,29 +1,16 @@
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
-// Define the Fee schema
 const FeeSchema = new Schema({
-    userId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
-        required: true
-    },
-    amount: {
-        type: Number,
-        default: 0 // Default amount
-    },
-    status: {
-        type: String,
-        enum: ['paid', 'unpaid'], // Fee status
-        default: 'unpaid' // Default status
-    },
-    date: {
-        type: Date,
-        default: () => new Date() // Default to current date
-    }
-}, {
-    timestamps: true // Optional: Adds createdAt and updatedAt fields
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+    amountDue: { type: Number, default: 0 }, 
+    amountPaid: { type: Number, default: 0 },
+    dueDate: { type: Date ,  default: null },
+    paymentHistory: [{
+        amountPaid: { type: Number, required: true },
+        paidOn: { type: Date, required: true, default: Date.now }
+    }]
 });
 
-// Create and export the model
-module.exports = mongoose.model('Fee', FeeSchema);
+const Fee = mongoose.model('Fee', FeeSchema);
+module.exports = Fee;
