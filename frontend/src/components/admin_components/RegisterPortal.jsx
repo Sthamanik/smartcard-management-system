@@ -34,9 +34,9 @@ const RegisterPortal = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(formData);
   
     try {
+
       const result = await signupUser(formData);
   
       if (result.success) {
@@ -55,12 +55,12 @@ const RegisterPortal = () => {
           uid: '',
           key: ''
         });
-        navigate('/adminPanel/');
         setSuccess("Signup successful!");
       } else {
         setError(result.message || "Signup failed. Please try again.");
         setSuccess(null);
       }
+      navigate('/adminpage/qr')
     } catch (err) {
       console.error("Signup error:", err);
       setError(err.message || "Signup failed. Please try again.");

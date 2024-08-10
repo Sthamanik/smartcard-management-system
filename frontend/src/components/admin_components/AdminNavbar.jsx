@@ -21,6 +21,12 @@ const AdminNavbar = () => {
           <Link to="/adminPage/qr" className="text-white hover:bg-indigo-500 px-3 py-2 rounded-md text-sm font-medium">
             QR Portal
           </Link>
+          <Link to="/adminPage/userlist" className="text-white hover:bg-indigo-500 px-3 py-2 rounded-md text-sm font-medium">
+            Users List
+          </Link>
+          <Link to="/adminPage/feelist" className="text-white hover:bg-indigo-500 px-3 py-2 rounded-md text-sm font-medium">
+            Fees List
+          </Link>
           <button 
             onClick={handleLogout} 
             className="text-white hover:bg-red-500 px-3 py-2 rounded-md text-sm font-medium">
