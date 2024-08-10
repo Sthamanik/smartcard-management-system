@@ -55,7 +55,7 @@ const RegisterPortal = () => {
           uid: '',
           key: ''
         });
-        navigate('/');
+        navigate('/adminPanel/');
         setSuccess("Signup successful!");
       } else {
         setError(result.message || "Signup failed. Please try again.");
@@ -69,7 +69,7 @@ const RegisterPortal = () => {
   };
 
   return (
-    <div className="max-w-lg mx-auto p-6 bg-white shadow-lg rounded-lg mt-10 lg:max-w-4xl">
+    <div className="max-w-lg mx-auto p-6 bg-white shadow-lg rounded-lg  lg:max-w-4xl">
       <h2 className="text-lg md:text-xl lg:text-2xl font-bold mb-6 text-center text-gray-800">Register the user</h2>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2">

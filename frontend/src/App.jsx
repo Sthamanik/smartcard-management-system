@@ -2,7 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Signup from './components/Signup';
 import Login from './components/Login';
-import Register from './components/admin_components/registerPortal';
+import AdminPage from './components/admin_components/AdminPage';
 
 function App() {
   return (
@@ -10,7 +10,7 @@ function App() {
       <Routes>
         <Route path="/signup" element={<Signup />} />
         <Route path="/" element={<Login />} />
-        <Route path="/adminPanel/register" element = {<Register/>} />
+        <Route path="/adminPage/*" element={<AdminPage />} />
       </Routes>
     </Router>
   );
