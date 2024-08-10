@@ -4,16 +4,17 @@ const User = require('./models/Users');
 const getDailyAttendanceModel = require('./models/Attendance');
 
 async function createDailyAttendanceRecords() {
-    const date = new Date();
-    const Attendance = getDailyAttendanceModel(date);
+    const nowTimestamp = Date.now();
+    const now = new Date(nowTimestamp);
+    const Attendance = getDailyAttendanceModel(now);
 
     try {
         const users = await User.find();
         const userIds = users.map(user => user._id);
 
         // Define the start and end of the day for accurate checking
-        const startOfDay = new Date(date.setHours(0, 0, 0, 0));
-        const endOfDay = new Date(date.setHours(23, 59, 59, 999));
+        const startOfDay = new Date(now.setHours(0, 0, 0, 0));
+        const endOfDay = new Date(now.setHours(23, 59, 59, 999));
 
         // Check for existing attendance records for today
         const existingRecords = await Attendance.find({
@@ -35,7 +36,7 @@ async function createDailyAttendanceRecords() {
                 status: 'absent',
                 enteredAt: '-',
                 exitedAt: '-',
-                date: new Date() // Use current date
+                date: now // Use current date
             }));
 
         if (attendanceRecords.length > 0) {
