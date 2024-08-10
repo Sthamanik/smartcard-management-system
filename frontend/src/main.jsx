@@ -4,6 +4,7 @@ import App from './App';
 import AuthProvider from './contexts/auth/authState'; // Ensure this import is correct
 import './index.css';
 import FeeProvider from './contexts/fees/feeState';
+import AttendanceProvider from './contexts/attendance/attendanceState';
 
 const rootElement = document.getElementById('root');
 const root = ReactDOM.createRoot(rootElement);
@@ -12,7 +13,9 @@ root.render(
   <React.StrictMode>
     <AuthProvider>
       <FeeProvider>
-      <App />
+        <AttendanceProvider>
+          <App />
+        </AttendanceProvider>
       </FeeProvider>
     </AuthProvider>
   </React.StrictMode>

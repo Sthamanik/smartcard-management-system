@@ -9,9 +9,8 @@ async function initializeFeeData(req, res, next) {
             if (!feeExists) {
                 await Fee.create({
                     userId: user._id,
-                    amountDue: 1000,
-                    amountPaid: 0,
-                    dueDate: new Date(),
+                    amountDue: 0,
+                    totalFee: 0,
                     paymentHistory: []
                 });
             }

@@ -69,7 +69,6 @@ UserSchema.post('save', async function (doc) {
                 userId: doc._id,
                 amountDue: 0, // Ensure this is 0, not 1000
                 totalFee: 0,
-                dueDate: null,
                 paymentHistory: []
             });
         }

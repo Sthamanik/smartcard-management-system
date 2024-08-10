@@ -28,7 +28,7 @@ router.get('/:userId', async (req, res) => {
 
 router.put('/updateFee/:userId', async (req, res) => {
     const { userId } = req.params;
-    const { amountPaid, amountDue, dueDate } = req.body;
+    const { amountPaid, amountDue, totalFee } = req.body;
 
     try {
         // Find the fee record by userId
@@ -57,23 +57,20 @@ router.put('/updateFee/:userId', async (req, res) => {
             });
         }
 
+        if (totalFee !== undefined) {
+            if (typeof totalFee !== 'number') {
+                return res.status(400).json({ error: 'Total fee must be a number' });
+            }
+            fee.totalFee += totalFee;
+            fee.amountDue += totalFee;
+        }
+
         // Check if amountDue is provided in the request body
         if (amountDue !== undefined) {
             if (typeof amountDue !== 'number') {
                 return res.status(400).json({ error: 'amountDue must be a number' });
             }
             fee.amountDue = amountDue;
-
-            // Update dueDate if provided
-            if (dueDate) {
-                const parsedDueDate = new Date(dueDate);
-                if (isNaN(parsedDueDate.getTime())) {
-                    return res.status(400).json({ error: 'Invalid dueDate format' });
-                }
-                fee.dueDate = parsedDueDate;
-            } else if (fee.amountDue <= 0) {
-                fee.dueDate = null; // Clear due date if amountDue is 0 or less
-            }
         }
 
         // Save the updated fee record

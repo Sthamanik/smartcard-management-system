@@ -5,6 +5,7 @@ import AdminNavbar from './AdminNavbar';
 import { Routes, Route } from 'react-router-dom';
 import UserList from './UserList';
 import FeeList from './Feelist';
+import AttendanceList from './AttendanceList';
 
 const AdminPage = () => {
   return (
@@ -15,6 +16,7 @@ const AdminPage = () => {
         <Route path="/qr" element={<QrPortal />} /> 
         <Route path="/userlist" element={<UserList />} /> 
         <Route path="/feelist" element={<FeeList />} /> 
+        <Route path="/attendancelist" element={<AttendanceList />} /> 
       </Routes>
     </>
   );

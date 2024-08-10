@@ -11,6 +11,11 @@ const attendanceSchema = new mongoose.Schema({
 
 // Function to get the daily attendance model based on the current date
 function getDailyAttendanceModel(date = new Date()) {
+    // Ensure date is a valid Date object
+    if (!(date instanceof Date) || isNaN(date.getTime())) {
+        throw new Error('Invalid Date object');
+    }
+    
     const dateString = date.toISOString().split('T')[0]; // Format date as YYYY-MM-DD
     const collectionName = `attendance_${dateString}`;
 

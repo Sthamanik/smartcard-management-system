@@ -124,4 +124,5 @@ router.put('/markExit/:userId', createDailyAttendanceRecords, async (req, res) =
     }
 });
 
+
 module.exports = router;
