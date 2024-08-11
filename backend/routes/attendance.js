@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
+const mongoose = require('mongoose');
 const User = require('../models/Users'); // Ensure this path is correct
 const getDailyAttendanceModel = require('../models/Attendance');
-const mongoose = require('mongoose')
 
 // Middleware to create attendance records for all users if not already present
 async function createDailyAttendanceRecords(req, res, next) {
@@ -32,30 +32,36 @@ async function createDailyAttendanceRecords(req, res, next) {
         
         next(); // Proceed to the next route handler
     } catch (error) {
+        console.error('Error creating daily attendance records:', error);
         res.status(500).json({ error: 'Error creating daily attendance records' });
     }
 }
 
-// Route to fetch attendance records from all collections
+// Helper function to get all attendance records
+async function getAllAttendanceRecords() {
+    // Retrieve the list of all collections
+    const collections = await mongoose.connection.db.listCollections().toArray();
+    
+    // Filter out attendance collections and create dynamic models
+    const attendanceCollections = collections
+        .filter(coll => coll.name.startsWith('attendance_'))
+        .map(coll => {
+            // Create a dynamic model for each attendance collection
+            return mongoose.model(coll.name, getDailyAttendanceModel().schema);
+        });
+    
+    // Fetch records from each attendance collection
+    const recordsPromises = attendanceCollections.map(model => model.find().exec());
+    const recordsArrays = await Promise.all(recordsPromises);
+    
+    // Aggregate all records
+    return recordsArrays.flat();
+}
+
+// Route to get all attendance records
 router.get('/attendance/all', async (req, res) => {
     try {
-        // Retrieve the list of all collections
-        const collections = await mongoose.connection.db.listCollections().toArray();
-        
-        // Filter out attendance collections
-        const attendanceCollections = collections
-            .filter(coll => coll.name.startsWith('attendance_'))
-            .map(coll => {
-                // Create a dynamic model for each attendance collection
-                return mongoose.model(coll.name, getDailyAttendanceModel().schema);
-            });
-        
-        // Fetch records from each attendance collection
-        const recordsPromises = attendanceCollections.map(model => model.find().exec());
-        const recordsArrays = await Promise.all(recordsPromises);
-        
-        // Aggregate all records
-        const allRecords = recordsArrays.flat();
+        const allRecords = await getAllAttendanceRecords();
         res.status(200).json(allRecords);
     } catch (error) {
         console.error('Error fetching attendance records:', error);
@@ -63,61 +69,35 @@ router.get('/attendance/all', async (req, res) => {
     }
 });
 
-router.get('/attendance/:date', async (req, res) => {
-    const { date } = req.params;
-    const Attendance = getDailyAttendanceModel(new Date(date));
-
-    try {
-        const records = await Attendance.find();
-        res.status(200).json(records);
-    } catch (error) {
-        res.status(500).json({ error: 'Error fetching attendance records' });
-    }
-});
-
-// Route to fetch attendance records for a specific user
-router.get('/attendance', async (req, res) => {
+// Route to get attendance records for a specific user
+router.get('/attendance/:userId', async (req, res) => {
     const { userId } = req.params;
 
     try {
-        // Retrieve the list of all collections
-        const collections = await mongoose.connection.db.listCollections().toArray();
+        // Get all attendance records
+        const allRecords = await getAllAttendanceRecords();
         
-        // Filter out attendance collections
-        const attendanceCollections = collections
-            .filter(coll => coll.name.startsWith('attendance_'))
-            .map(coll => {
-                // Create a dynamic model for each attendance collection
-                return mongoose.model(coll.name, getDailyAttendanceModel().schema);
-            });
+        // Filter records by userId
+        const userRecords = allRecords.filter(record => record.userId.toString() === userId);
         
-        // Fetch records from each attendance collection for the specified userId
-        const recordsPromises = attendanceCollections.map(model => 
-            model.find({ userId: req.userId }).exec()
-        );
-        const recordsArrays = await Promise.all(recordsPromises);
-        
-        // Aggregate all records
-        const allRecords = recordsArrays.flat();
-        res.status(200).json(allRecords);
+        res.status(200).json(userRecords);
     } catch (error) {
         console.error('Error fetching attendance records for user:', error);
         res.status(500).json({ error: 'Error fetching attendance records for user' });
     }
 });
 
-
-
-// Route to fetch attendance records for a specific user
-router.get('/attendance/:date/:userId/', async (req, res) => {
+// Route to fetch attendance records for a specific user on a specific date
+router.get('/attendance/:date/:userId', async (req, res) => {
     const { userId, date } = req.params;
     const Attendance = getDailyAttendanceModel(new Date(date));
 
     try {
         const record = await Attendance.findOne({ userId });
-        if (!record) return res.status(404).json({ error: 'No attendance record found for this user' });
+        if (!record) return res.status(404).json({ error: 'No attendance record found for this user on this date' });
         res.status(200).json(record);
     } catch (error) {
+        console.error('Error fetching attendance record:', error);
         res.status(500).json({ error: 'Error fetching attendance record' });
     }
 });
@@ -130,11 +110,12 @@ router.put('/markEntry/:userId', createDailyAttendanceRecords, async (req, res) 
     const enteredAt = new Date().toLocaleTimeString();
 
     try {
-        let attendance = await Attendance.findOne({userId}) 
-        if (attendance.enteredAt <= enteredAt && attendance.enteredAt !== "-") return res.status(400).json({error: "Cant enter again"})
+        let attendance = await Attendance.findOne({ userId }); 
+        if (attendance.enteredAt !== "-" && attendance.enteredAt <= enteredAt) return res.status(400).json({ error: "Can't enter again" });
         attendance = await Attendance.findOneAndUpdate({ userId }, { $set: { enteredAt, status: 'present' } }, { new: true });
         res.status(200).json(attendance);
     } catch (error) {
+        console.error('Error marking entry:', error);
         res.status(500).json({ error: 'Error marking attendance' });
     }
 });
@@ -147,15 +128,15 @@ router.put('/markExit/:userId', createDailyAttendanceRecords, async (req, res) =
     const exitedAt = new Date().toLocaleTimeString();
 
     try {
-        let attendance = await Attendance.findOne({userId}) 
-        if (attendance.exitedAt <= exitedAt && attendance.exitedAt !== "-") return res.status(400).json({error: "Cant exit again"})
-        if (attendance.enteredAt === "-") return res.status(400).json({error: "Cant exit without doing the entry"})
+        let attendance = await Attendance.findOne({ userId }); 
+        if (attendance.exitedAt !== "-" && attendance.exitedAt <= exitedAt) return res.status(400).json({ error: "Can't exit again" });
+        if (attendance.enteredAt === "-") return res.status(400).json({ error: "Can't exit without doing the entry" });
         attendance = await Attendance.findOneAndUpdate({ userId }, { $set: { exitedAt } }, { new: true });
         res.status(200).json(attendance);
     } catch (error) {
+        console.error('Error marking exit:', error);
         res.status(500).json({ error: 'Error marking attendance' });
     }
 });
-
 
 module.exports = router;

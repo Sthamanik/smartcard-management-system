@@ -8,15 +8,15 @@ app = Flask(__name__)
 # Global variable to store the decrypted message
 decrypted_message_global = ""
 
-@app.route('/', methods=['GET'])
-def index():
-    return "kxa"
+@app.route('/')
+def home():
+    return render_template('main.html')
 
 @app.route('/decrypted_message')
 def get_decrypted_message():
     return jsonify(decrypted_message=decrypted_message_global)
 
-@app.route('/scan_qr', methods=['GET'])
+@app.route('/scan_qr', methods=['POST'])
 def scan_qr():
     global decrypted_message_global
 
@@ -70,5 +70,5 @@ def decode_qr_code(frame):
 
     return frame, qr_data, decrypted_message, qr_detected
 
-if __name__ == "__main__":
+if __name__ == "_main_":
     app.run(debug=False, use_reloader=False)

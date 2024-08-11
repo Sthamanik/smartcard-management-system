@@ -12,6 +12,7 @@ const attendanceSchema = new mongoose.Schema({
 // Function to get the daily attendance model based on the current date
 function getDailyAttendanceModel(date = new Date()) {
     if (!(date instanceof Date) || isNaN(date.getTime())) {
+        console.error('Invalid Date object:', date); // Log the invalid date
         throw new Error('Invalid Date object');
     }
     

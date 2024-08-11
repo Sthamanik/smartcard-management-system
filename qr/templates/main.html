@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Code Decryptor</title>
+</head>
+<body>
+    <h1>Decrypted Message:</h1>
+    <p id="decrypted-message">Waiting for QR code...</p>
+
+    <video id="video" width="640" height="480" autoplay></video>
+
+    <script>
+        let decryptedData = {};  // Variable to store the JSON response
+        const video = document.getElementById('video');
+        let stream;  // Variable to store the video stream
+
+        // Access the device camera and stream to the video element
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(mediaStream => {
+                stream = mediaStream;
+                video.srcObject = stream;
+            })
+            .catch(err => {
+                console.error("Error accessing the camera: ", err);
+            });
+
+        function stopVideoStream() {
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());  // Stop all tracks in the stream
+                video.srcObject = null;  // Remove the video source
+            }
+        }
+
+        function captureFrameAndSend() {
+            const canvas = document.createElement('canvas');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            // Ensure the Blob is created correctly
+            canvas.toBlob(function(blob) {
+                if (blob) {
+                    const formData = new FormData();
+                    formData.append('frame', blob, 'frame.jpg');
+
+                    fetch('/scan_qr', {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        decryptedData = data;  // Store the JSON response in the variable
+                        if (decryptedData.decrypted_message) {
+                            document.getElementById('decrypted-message').innerText = decryptedData.decrypted_message;
+                            stopVideoStream();  // Stop the camera once QR is successfully detected and decrypted
+                        } else {
+                            document.getElementById('decrypted-message').innerText = "Waiting for QR code...";
+                        }
+                        console.log(decryptedData);
+                    });
+                } else {
+                    console.error("Failed to create Blob from canvas.");
+                }
+            }, 'image/jpeg');
+        }
+
+        // Capture and send a frame every second
+        setInterval(captureFrameAndSend, 1000);
+    </script>
+</body>
+</html>
