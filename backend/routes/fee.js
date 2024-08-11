@@ -15,6 +15,17 @@ router.get('/', async (req, res) => {
     }
 })
 
+router.get('/user', async (req, res) => {
+    const userId  = req.userId;
+
+    try {
+        const fees = await Fee.find({ userId }).sort({ date: -1 }); // Sort by date, descending
+        res.status(200).json(fees);
+    } catch (error) {
+        res.status(500).json({ error: 'Error fetching fee records' });
+    }
+});
+
 router.get('/:userId', async (req, res) => {
     const { userId } = req.params;
 

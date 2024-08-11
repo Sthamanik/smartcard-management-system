@@ -76,6 +76,39 @@ router.get('/attendance/:date', async (req, res) => {
 });
 
 // Route to fetch attendance records for a specific user
+router.get('/attendance', async (req, res) => {
+    const { userId } = req.params;
+
+    try {
+        // Retrieve the list of all collections
+        const collections = await mongoose.connection.db.listCollections().toArray();
+        
+        // Filter out attendance collections
+        const attendanceCollections = collections
+            .filter(coll => coll.name.startsWith('attendance_'))
+            .map(coll => {
+                // Create a dynamic model for each attendance collection
+                return mongoose.model(coll.name, getDailyAttendanceModel().schema);
+            });
+        
+        // Fetch records from each attendance collection for the specified userId
+        const recordsPromises = attendanceCollections.map(model => 
+            model.find({ userId: req.userId }).exec()
+        );
+        const recordsArrays = await Promise.all(recordsPromises);
+        
+        // Aggregate all records
+        const allRecords = recordsArrays.flat();
+        res.status(200).json(allRecords);
+    } catch (error) {
+        console.error('Error fetching attendance records for user:', error);
+        res.status(500).json({ error: 'Error fetching attendance records for user' });
+    }
+});
+
+
+
+// Route to fetch attendance records for a specific user
 router.get('/attendance/:date/:userId/', async (req, res) => {
     const { userId, date } = req.params;
     const Attendance = getDailyAttendanceModel(new Date(date));

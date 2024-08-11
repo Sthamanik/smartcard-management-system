@@ -36,6 +36,8 @@ const Login = () => {
         setFormData({ email: '', password: '', role: 'user', key: ''});
 
         if ( role === "admin") { navigate("/adminPage")}
+        if ( role === "staff") { navigate("/staffPage")}
+        if ( role === "user") { navigate("/userInterface")}
       } else {
         setError(result.message || "Login failed. Please try again.");
         setSuccess(null);

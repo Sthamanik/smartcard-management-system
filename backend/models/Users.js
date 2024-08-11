@@ -49,6 +49,9 @@ const UserSchema = new Schema({
     },
     uid: {
         type: Number,
+    },
+    path: {
+        type: String
     }
 });
 

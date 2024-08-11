@@ -21,7 +21,7 @@ router.post('/signup', [
     }
     let success = false;
     try {
-        const { name, email, password, address, DOB, gender, contact, role, faculty, batch, uid, key } = req.body;
+        const { name, email, password, address, DOB, gender, contact, role, faculty, batch, uid, key, path } = req.body;
 
         let user = await User.findOne({ email });
         if (user) return res.status(400).json({ success, error: "Email already exists" });
@@ -40,7 +40,7 @@ router.post('/signup', [
             user = await User.create({ name, email, password: hashedPass, address, DOB, gender, contact, role});
             res.json({ success: true, msg: "Signed Up" });
         }
-        user = await User.create({ name, email, password: hashedPass, address, DOB, gender, contact, role, faculty, batch, uid });
+        user = await User.create({ name, email, password: hashedPass, address, DOB, gender, contact, role, faculty, batch, uid , path});
         res.json({ success: true, msg: "Signed Up" });
     } catch (error) {
         console.error("Signup Error:", error);
@@ -94,7 +94,7 @@ router.put('/changepass', fetchUser, async (req, res) => {
     }
 });
 
-// fetch the user details api('/data/fetchData')
+// fetch the user details api('/auth/fetchData')
 router.get('/getUsers', fetchUser, async (req, res) => {
     try {
         let user = await User.findOne({ _id: req.userId });
@@ -108,6 +108,18 @@ router.get('/getUsers', fetchUser, async (req, res) => {
         res.status(500).send("Internal Server Error");
     }
 });
+
+
+router.get('/getUserData', fetchUser, async (req, res) => {
+    try{
+        let userData = await User.findOne({_id: req.userId})
+        if (userData.length === 0) return res.json({ msg: "No data to show" });
+        res.json(userData);
+    } catch (err) {
+        console.error("Fetch Users Error:", err);
+        res.status(500).send("Internal Server Error");
+    }
+})
 
 // update the user details api('/data/updateData')
 router.put('/updateData/:id', fetchUser, async (req, res) => {

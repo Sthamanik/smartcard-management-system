@@ -4,15 +4,16 @@ const User = require('./models/Users');
 const getDailyAttendanceModel = require('./models/Attendance');
 
 async function createDailyAttendanceRecords() {
-    const nowTimestamp = Date.now();
-    const now = new Date(nowTimestamp);
+    // Get the current date
+    const now = new Date();
     const Attendance = getDailyAttendanceModel(now);
 
     try {
+        // Retrieve all users
         const users = await User.find();
         const userIds = users.map(user => user._id);
 
-        // Define the start and end of the day for accurate checking
+        // Define the start and end of the day
         const startOfDay = new Date(now.setHours(0, 0, 0, 0));
         const endOfDay = new Date(now.setHours(23, 59, 59, 999));
 

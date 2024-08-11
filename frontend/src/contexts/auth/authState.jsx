@@ -66,6 +66,7 @@ const AuthProvider = ({ children }) => {
     }
   };
 
+
   // Fetch user details function
   const fetchUserDetails = async () => {
     setLoading(true);

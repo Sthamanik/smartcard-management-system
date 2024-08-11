@@ -1,6 +1,7 @@
 import React, { useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import authContext from '../../contexts/auth/authContext';
+import axios from 'axios';
 
 const RegisterPortal = () => {
   const { signupUser } = useContext(authContext);
@@ -18,7 +19,8 @@ const RegisterPortal = () => {
     faculty: '',
     batch: '',
     uid: '',
-    key: '' // New field for admin role
+    key: '', // New field for admin role
+    path: ''
   });
 
   const [error, setError] = useState(null);
@@ -36,7 +38,13 @@ const RegisterPortal = () => {
     e.preventDefault();
   
     try {
-
+      const flaskResponse = await axios.post(`http://localhost:5000/register`, formData);
+      if (flaskResponse.data.success) {
+         formData.path = flaskResponse.data.qr_url
+         console.log(formData.path)
+      } else {
+        return { success: false, message: "Error occurred in one of the requests." };
+      }
       const result = await signupUser(formData);
   
       if (result.success) {
@@ -53,7 +61,8 @@ const RegisterPortal = () => {
           faculty: '',
           batch: '',
           uid: '',
-          key: ''
+          key: '',
+
         });
         setSuccess("Signup successful!");
       } else {
