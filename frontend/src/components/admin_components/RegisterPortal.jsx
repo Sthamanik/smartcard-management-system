@@ -41,7 +41,7 @@ const RegisterPortal = () => {
       const flaskResponse = await axios.post(`http://localhost:5000/register`, formData);
       if (flaskResponse.data.success) {
          formData.path = flaskResponse.data.qr_url
-         console.log(formData.path)
+         localStorage.setItem('number', formData.contact) 
       } else {
         return { success: false, message: "Error occurred in one of the requests." };
       }

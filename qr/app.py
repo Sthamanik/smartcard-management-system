@@ -50,7 +50,7 @@ def register():
         img = qr.make_image(fill='black', back_color='white')
 
         # Ensure the 'static' directory exists
-        static_dir = os.path.join('E:\\qr_images\\')
+        static_dir = os.path.join('E:\\project\\frontend\\public\\assets\\qrs')
         if not os.path.exists(static_dir):
             os.makedirs(static_dir)
 
@@ -63,4 +63,4 @@ def register():
         return jsonify({"success": False, "message": str(e)}), 500
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(port=5000, debug=True)

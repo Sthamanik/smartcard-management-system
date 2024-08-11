@@ -6,6 +6,7 @@ import { Routes, Route } from 'react-router-dom';
 import UserList from './UserList';
 import FeeList from './Feelist';
 import AttendanceList from './AttendanceList';
+import AttendancePortal from './AttendancePortal';
 
 const AdminPage = () => {
   return (
@@ -17,6 +18,7 @@ const AdminPage = () => {
         <Route path="/userlist" element={<UserList />} /> 
         <Route path="/feelist" element={<FeeList />} /> 
         <Route path="/attendancelist" element={<AttendanceList />} /> 
+        <Route path="/attendancePortal" element={<AttendancePortal />} />
       </Routes>
     </>
   );

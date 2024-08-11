@@ -30,6 +30,9 @@ const AdminNavbar = () => {
           <Link to="/adminPage/attendancelist" className="text-white hover:bg-indigo-500 px-3 py-2 rounded-md text-sm font-medium">
             Attendance List
           </Link>
+          <Link to="/adminPage/attendancePortal" className="text-white hover:bg-indigo-500 px-3 py-2 rounded-md text-sm font-medium">
+            Attendance portal
+          </Link>
           <button 
             onClick={handleLogout} 
             className="text-white hover:bg-red-500 px-3 py-2 rounded-md text-sm font-medium">

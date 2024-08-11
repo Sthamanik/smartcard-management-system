@@ -1,11 +1,17 @@
-import React from 'react'
+import React from 'react';
 
 const QrPortal = () => {
-  return (
-    <div>
-      adfasfds
-    </div>
-  )
-}
+    // Get the number from localStorage
+    const num = localStorage.getItem('number');
 
-export default QrPortal
+    // Construct the image URL
+    const imageUrl = `/assets/qrs/${num}.jpg`;
+
+    return (
+        <div>
+            <img src={imageUrl} alt="QR Code" />
+        </div>
+    );
+};
+
+export default QrPortal;
